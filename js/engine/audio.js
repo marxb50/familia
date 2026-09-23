@@ -153,15 +153,36 @@ class AudioManager {
 
   playNarration(phaseIndex, onEndCallback) {
     this.stopNarration();
-    const audioUrl = 'assets/audio/cutscene_' + phaseIndex + '.mp3';
-    this.currentNarration = new Audio(audioUrl);
-    this.currentNarration.volume = this.muted ? 0 : 1;
 
-    if (onEndCallback) {
-      this.currentNarration.addEventListener('ended', onEndCallback);
+    // Proteção de debounce: impedir múltiplos disparos em menos de 350ms
+    const now = Date.now();
+    if (this._lastNarrationPlay && (now - this._lastNarrationPlay < 350) && this._lastNarrationPhase === phaseIndex) {
+      return this.currentNarration;
+    }
+    this._lastNarrationPlay = now;
+    this._lastNarrationPhase = phaseIndex;
+
+    // Parar qualquer instância global de narração remanescente
+    if (AudioManager._globalNarration) {
+      try {
+        AudioManager._globalNarration.pause();
+        AudioManager._globalNarration.currentTime = 0;
+        AudioManager._globalNarration.src = '';
+      } catch (_) {}
+      AudioManager._globalNarration = null;
     }
 
-    this.currentNarration.play().catch(e => {
+    const audioUrl = 'assets/audio/cutscene_' + phaseIndex + '.mp3';
+    const narrationAudio = new Audio(audioUrl);
+    narrationAudio.volume = this.muted ? 0 : 1;
+    this.currentNarration = narrationAudio;
+    AudioManager._globalNarration = narrationAudio;
+
+    if (onEndCallback) {
+      narrationAudio.addEventListener('ended', onEndCallback, { once: true });
+    }
+
+    narrationAudio.play().catch(e => {
       console.log('Audio autoplay prevented or file loading:', e);
       if (onEndCallback) onEndCallback();
     });
@@ -171,9 +192,18 @@ class AudioManager {
 
   stopNarration() {
     if (this.currentNarration) {
-      this.currentNarration.pause();
-      this.currentNarration.currentTime = 0;
+      try {
+        this.currentNarration.pause();
+        this.currentNarration.currentTime = 0;
+      } catch (_) {}
       this.currentNarration = null;
+    }
+    if (AudioManager._globalNarration) {
+      try {
+        AudioManager._globalNarration.pause();
+        AudioManager._globalNarration.currentTime = 0;
+      } catch (_) {}
+      AudioManager._globalNarration = null;
     }
   }
 

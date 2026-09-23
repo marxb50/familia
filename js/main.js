@@ -116,7 +116,13 @@ class Game {
     }
 
     if (btnConfirm) {
-      const handleConfirm = () => {
+      let confirmBusy = false;
+      const handleConfirm = (e) => {
+        if (e && e.type === 'touchend') e.preventDefault();
+        if (confirmBusy) return;
+        confirmBusy = true;
+        setTimeout(() => { confirmBusy = false; }, 500);
+
         try { if (this.audio && this.audio.init) this.audio.init(); } catch (_) {}
         try { if (this.audio && this.audio.playClick) this.audio.playClick(); } catch (_) {}
         const charSelect = document.getElementById('screen-char-select');
@@ -125,7 +131,7 @@ class Game {
         this.showCutscene(0);
       };
       btnConfirm.addEventListener('click', handleConfirm);
-      btnConfirm.addEventListener('touchend', (e) => { e.preventDefault(); handleConfirm(); });
+      btnConfirm.addEventListener('touchend', handleConfirm);
     }
 
     // Cutscene buttons
@@ -133,7 +139,13 @@ class Game {
     const btnReplayVoice = document.getElementById('btn-replay-voice');
 
     if (btnStartLevel) {
-      const handleStartLevel = () => {
+      let startBusy = false;
+      const handleStartLevel = (e) => {
+        if (e && e.type === 'touchend') e.preventDefault();
+        if (startBusy) return;
+        startBusy = true;
+        setTimeout(() => { startBusy = false; }, 500);
+
         try { if (this.audio && this.audio.playClick) this.audio.playClick(); } catch (_) {}
         try { if (this.audio && this.audio.stopNarration) this.audio.stopNarration(); } catch (_) {}
         const cutscene = document.getElementById('screen-cutscene');
@@ -141,16 +153,22 @@ class Game {
         this.startCurrentLevel();
       };
       btnStartLevel.addEventListener('click', handleStartLevel);
-      btnStartLevel.addEventListener('touchend', (e) => { e.preventDefault(); handleStartLevel(); });
+      btnStartLevel.addEventListener('touchend', handleStartLevel);
     }
 
     if (btnReplayVoice) {
-      const handleReplay = () => {
+      let replayBusy = false;
+      const handleReplay = (e) => {
+        if (e && e.type === 'touchend') e.preventDefault();
+        if (replayBusy) return;
+        replayBusy = true;
+        setTimeout(() => { replayBusy = false; }, 500);
+
         try { if (this.audio && this.audio.playClick) this.audio.playClick(); } catch (_) {}
         try { if (this.audio && this.audio.playNarration) this.audio.playNarration(this.currentLevelIndex + 1); } catch (_) {}
       };
       btnReplayVoice.addEventListener('click', handleReplay);
-      btnReplayVoice.addEventListener('touchend', (e) => { e.preventDefault(); handleReplay(); });
+      btnReplayVoice.addEventListener('touchend', handleReplay);
     }
 
     // HUD Leader switch
@@ -659,7 +677,12 @@ class Game {
   }
 }
 
-// Start game instance on page load
-window.addEventListener('DOMContentLoaded', () => {
-  window.game = new Game();
-});
+// Singleton bootstrap do jogo
+if (!window._gameBootstrapRegistered) {
+  window._gameBootstrapRegistered = true;
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.game) {
+      window.game = new Game();
+    }
+  });
+}
