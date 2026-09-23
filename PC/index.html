@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>O Castelo que Nasce do Coração - Edição Computador</title>
+  <link rel="stylesheet" href="PC/style.css?v=1.0">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <script>
+    // Prevenção de rolagem com teclas de jogo
+    window.addEventListener('keydown', function(e) {
+      if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  </script>
+</head>
+<body>
+
+  <!-- Header Real -->
+  <header class="pc-header">
+    <div class="pc-header-title">O CASTELO QUE NASCE DO CORAÇÃO</div>
+    <div class="pc-header-sub">Um Conto de Amor, Magia e Adoção • Edição Computador</div>
+  </header>
+
+  <!-- Gabinete Arcade Real -->
+  <main class="pc-cabinet" id="arcadeContainer">
+    <!-- Top HUD -->
+    <div id="game-hud">
+      <!-- Left: Leader & Companion -->
+      <div class="hud-left">
+        <div class="hud-panel" id="btn-hud-switch" style="cursor: pointer;" title="Clique ou aperte 'C' para alternar o líder">
+          <img id="hud-leader-img" class="hud-avatar" src="assets/images/characters/king_idle.png" alt="Líder">
+          <span id="hud-leader-name">Rei</span>
+          <span style="color: #b68d40; font-size: 11px;">(Trocar: C)</span>
+          <span style="margin: 0 4px; color: #b68d40;">⇄</span>
+          <img id="hud-companion-img" class="hud-avatar" src="assets/images/characters/queen_idle.png" alt="Parceiro">
+        </div>
+      </div>
+
+      <!-- Center: Current Level Title & 5 Heart Virtues -->
+      <div class="hud-center">
+        <div class="hud-panel">
+          <span id="hud-phase-title" style="color: #6a4f27;">Fase 1: O Castelo Sem Cores</span>
+          <div style="display: flex; gap: 6px; margin-left: 10px; align-items: center;">
+            <img id="hud-heart-green" class="heart-slot" src="assets/images/ui/heart_green.png" title="💚 Verde: O Mago e a Esperança">
+            <img id="hud-heart-yellow" class="heart-slot" src="assets/images/ui/heart_yellow.png" title="💛 Amarelo: Príncipe Matheus">
+            <img id="hud-heart-blue" class="heart-slot" src="assets/images/ui/heart_blue.png" title="💙 Azul: O Laço dos Irmãos">
+            <img id="hud-heart-red" class="heart-slot" src="assets/images/ui/heart_red.png" title="❤️ Vermelho: Príncipe Pedro">
+            <img id="hud-heart-pink" class="heart-slot" src="assets/images/ui/heart_pink.png" title="💖 Rosa: Princesa Maria Rosa">
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Quick sound & PS1 -->
+      <div class="hud-right">
+        <button id="btn-toggle-ps1" class="hud-btn" style="width: auto; padding: 0 12px; font-size: 11px; font-weight: bold;" title="Modo Retrô PS1 (Tecla P)">🎮 PS1: OFF</button>
+        <div class="hud-btn" id="btn-hud-mute" title="Ligar/Desligar Som (Tecla M)">🔊</div>
+      </div>
+    </div>
+
+    <!-- Main Game Canvas -->
+    <div class="canvas-container">
+      <canvas id="game-canvas" width="1280" height="720"></canvas>
+    </div>
+
+    <!-- PS1 CRT Scanlines & Screen Overlay -->
+    <div id="ps1-overlay" class="ps1-overlay hidden">
+      <div class="ps1-badge">PS1 • 240p 15-bit</div>
+    </div>
+
+    <!-- Character Select Overlay -->
+    <div id="screen-char-select" class="overlay-screen">
+      <div class="fairytale-card">
+        <div class="card-title">O Castelo que Nasce do Coração</div>
+        <div class="card-subtitle">Um Conto de Amor, Magia e Adoção</div>
+        
+        <p style="font-size: 14px; color: #5a4935; margin-bottom: 10px;">
+          Escolha com qual personagem deseja iniciar a liderança da jornada:
+        </p>
+
+        <div class="char-options">
+          <div id="card-king" class="char-card selected">
+            <img src="assets/images/characters/king_idle.png" class="char-avatar" alt="O Rei">
+            <div class="char-name">O Rei</div>
+            <div class="char-role">Corajoso & Protetor</div>
+          </div>
+
+          <div id="card-queen" class="char-card">
+            <img src="assets/images/characters/queen_idle.png" class="char-avatar" alt="A Rainha">
+            <div class="char-name">A Rainha</div>
+            <div class="char-role">Doce & Esperançosa</div>
+          </div>
+        </div>
+
+        <div style="background: #faebd2; border-radius: 12px; padding: 10px 18px; margin-bottom: 22px; font-size: 13px; color: #724d1a; max-width: 580px;">
+          ✨ <strong>O casal sempre caminha junto!</strong> Pressione a tecla <strong>[C]</strong> durante o jogo para alternar quem você controla.
+        </div>
+
+        <button id="btn-confirm-char" class="btn-gold">Iniciar Jornada Real 👑</button>
+      </div>
+    </div>
+
+    <!-- Cutscene Modal -->
+    <div id="screen-cutscene" class="overlay-screen hidden">
+      <div class="fairytale-card" style="max-width: 880px;">
+        <div class="cutscene-container">
+          <img id="cutscene-art-img" class="cutscene-art" src="assets/images/cutscenes/cutscene_1.png" alt="Ilustração do Livro">
+          
+          <div class="cutscene-content">
+            <span id="cutscene-tag" class="cutscene-phase-tag">Capítulo 1 de 8</span>
+            <h2 id="cutscene-heading" class="card-title" style="font-size: 21px; text-align: left;">O Castelo Sem Cores</h2>
+            
+            <p id="cutscene-desc" class="cutscene-text">
+              Era uma vez, em um reino distante, um rei e uma rainha que moravam em um lindo castelo...
+            </p>
+
+            <div class="voice-status">
+              <div class="voice-wave">
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+              </div>
+              <span>Locução oficial: <strong>Thalita Neural</strong></span>
+            </div>
+
+            <div style="display: flex; gap: 14px; margin-top: 10px;">
+              <button id="btn-replay-voice" class="btn-gold" style="padding: 10px 20px; font-size: 13px; background: #faebd2; color: #724d1a; border-color: #dfc382;">Ouvir Novamente 🎙️</button>
+              <button id="btn-start-level" class="btn-gold" style="padding: 10px 28px; font-size: 14px;">Entrar na Fase ⚔️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Victory Screen -->
+    <div id="screen-victory" class="overlay-screen hidden">
+      <div class="fairytale-card" style="max-width: 780px;">
+        <div class="card-title" style="color: #2e7d32; font-size: 30px;">O Poder da Adoção!</div>
+        <div class="card-subtitle" style="font-size: 16px;">O Castelo Ganhou Todas as Cores do Amor</div>
+
+        <img src="assets/images/characters/children_trio.png" style="max-width: 380px; width: 92%; max-height: 250px; object-fit: contain; filter: drop-shadow(0 10px 25px rgba(0,0,0,0.28)); margin: 10px 0 16px 0;" alt="Todos os Filhos: Matheus, Pedro e Maria Rosa">
+
+        <div style="font-size: 15px; font-weight: bold; color: #b68d40; margin-bottom: 10px;">
+          💙 Matheus &nbsp;•&nbsp; ⚔️ Pedro &nbsp;•&nbsp; 🌸 Maria Rosa
+        </div>
+
+        <p style="font-size: 15px; line-height: 1.6; color: #3b3126; max-width: 620px; margin-bottom: 22px; font-style: italic; background: #fff; padding: 14px 20px; border-radius: 12px; border: 1.5px solid #faebcd;">
+          "E assim descobriram que uma verdadeira família nasce do AMOR, nasce do cuidado e do afeto... que o ABRAÇO vai ser sempre uma porta aberta para a felicidade, que filhos não precisam nascer só da barriga e que também podem nascer no coração. Esse é o poder da adoção!"
+        </p>
+
+        <button id="btn-play-again" class="btn-gold">Jogar Novamente 👑</button>
+      </div>
+    </div>
+
+    <!-- Barra Inferior de Atalhos e Controles -->
+    <footer class="pc-controls-bar">
+      <div class="controls-hint">
+        <span class="control-key">←</span> <span class="control-key">→</span> ou <span class="control-key">A</span> <span class="control-key">D</span> Mover &nbsp;|&nbsp;
+        <span class="control-key">ESPAÇO</span> ou <span class="control-key">W</span> Pular &nbsp;|&nbsp;
+        <span class="control-key">C</span> Trocar Parceiro &nbsp;|&nbsp;
+        <span class="control-key">P</span> PS1 Retrô
+      </div>
+      <div class="controls-actions">
+        <a href="index.html?view=phases&platform=PC" class="btn-pc-action" id="btnHomePortal" title="Menu Principal / Escolher Fases">🏠 Menu / Fases</a>
+        <button class="btn-pc-action" id="btnSound" title="Ligar/Desligar Som (Tecla M)">🔊 Som (M)</button>
+        <button class="btn-pc-action" id="btnFullscreen" title="Tela Cheia (Tecla F)">⛶ Tela Cheia (F)</button>
+        <button class="btn-pc-action" id="btnRestart" title="Reiniciar Fase (Tecla R)">🔄 Reiniciar (R)</button>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Scripts do Jogo Compartilhados -->
+  <script src="js/engine/input.js?v=4"></script>
+  <script src="js/engine/audio.js?v=3"></script>
+  <script src="js/engine/physics.js?v=3"></script>
+  <script src="js/engine/camera.js?v=3"></script>
+  <script src="js/entities/player.js?v=3"></script>
+  <script src="js/entities/npc.js?v=3"></script>
+  <script src="js/entities/collectable.js?v=3"></script>
+  <script src="js/levels/levels.js?v=3"></script>
+  <script src="js/main.js?v=4"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      window.game = new Game();
+    });
+  </script>
+</body>
+</html>

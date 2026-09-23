@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>O Castelo que Nasce do Coração - Edição Celular</title>
+  <link rel="stylesheet" href="css/style.css?v=3.1">
+  <link rel="stylesheet" href="celular/style.css?v=1.1">
+  <script>
+    // Prevenção de rolagem e zoom acidental por pinça
+    document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
+    document.addEventListener('touchmove', function(e) {
+      if (e.target.closest('#touch-controls-layer') || e.target.closest('#game-canvas')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    // Auto Fullscreen ao girar o aparelho na horizontal (Paisagem)
+    function triggerAutoFullscreen() {
+      const isLandscape = window.innerWidth > window.innerHeight;
+      if (isLandscape && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        const doc = document.documentElement;
+        if (doc.requestFullscreen) {
+          doc.requestFullscreen().catch(() => {});
+        } else if (doc.webkitRequestFullscreen) {
+          doc.webkitRequestFullscreen();
+        }
+        if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
+          window.screen.orientation.lock('landscape').catch(() => {});
+        }
+      }
+    }
+
+    window.addEventListener('orientationchange', function() {
+      setTimeout(triggerAutoFullscreen, 150);
+      setTimeout(triggerAutoFullscreen, 400);
+    });
+    if (window.screen && window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', function() {
+        setTimeout(triggerAutoFullscreen, 150);
+        setTimeout(triggerAutoFullscreen, 400);
+      });
+    }
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > window.innerHeight) {
+        setTimeout(triggerAutoFullscreen, 100);
+      }
+    });
+    document.addEventListener('touchstart', triggerAutoFullscreen, { passive: true, once: true });
+    document.addEventListener('pointerdown', triggerAutoFullscreen, { passive: true, once: true });
+  </script>
+</head>
+<body>
+
+  <main class="mobile-wrapper" id="mobileWrapper">
+    <!-- Barra Superior Flutuante Minimalista -->
+    <header class="mobile-top-bar">
+      <!-- HUD Compacto: Líder & Virtudes -->
+      <div class="mobile-hud-pill" id="btn-hud-switch" title="Toque para alternar o líder">
+        <img id="hud-leader-img" class="mobile-avatar" src="assets/images/characters/king_idle.png" alt="Líder">
+        <span id="hud-leader-name" class="mobile-leader-name">Rei</span>
+        <span class="mobile-switch-icon">⇄</span>
+        <img id="hud-companion-img" class="mobile-avatar" src="assets/images/characters/queen_idle.png" alt="Parceiro">
+        <div class="mobile-hearts-row">
+          <img id="hud-heart-green" class="heart-slot" src="assets/images/ui/heart_green.png" alt="💚">
+          <img id="hud-heart-yellow" class="heart-slot" src="assets/images/ui/heart_yellow.png" alt="💛">
+          <img id="hud-heart-blue" class="heart-slot" src="assets/images/ui/heart_blue.png" alt="💙">
+          <img id="hud-heart-red" class="heart-slot" src="assets/images/ui/heart_red.png" alt="❤️">
+          <img id="hud-heart-pink" class="heart-slot" src="assets/images/ui/heart_pink.png" alt="💖">
+        </div>
+      </div>
+
+      <!-- Ações de topo -->
+      <div class="mobile-actions">
+        <a href="index.html?view=phases&platform=celular" class="top-circle-btn" id="btnMobileHomePortal" title="Menu Principal / Escolher Fases">🏠</a>
+        <button class="top-circle-btn" id="btnMobilePS1" title="Alternar Modo Retrô PS1">🎮</button>
+        <button class="top-circle-btn" id="btnMobileSound" title="Ligar/Desligar Som">🔊</button>
+        <button class="top-circle-btn" id="btnMobileFullscreen" title="Tela Cheia">⛶</button>
+      </div>
+    </header>
+
+    <!-- Canvas do Jogo 16:9 Adaptado -->
+    <div class="canvas-container">
+      <canvas id="game-canvas" width="1280" height="720"></canvas>
+    </div>
+
+    <!-- PS1 CRT Scanlines & Screen Overlay -->
+    <div id="ps1-overlay" class="ps1-overlay hidden">
+      <div class="ps1-badge">PS1 • 240p 15-bit</div>
+    </div>
+
+    <!-- Controles Virtuais Semi-Transparentes na Tela -->
+    <div class="touch-controls-layer" id="touch-controls-layer">
+      <!-- Lado esquerdo: Direcionais Esquerda e Direita -->
+      <div class="touch-zone-left">
+        <button class="touch-btn-game touch-btn-dir" id="btn-touch-left" aria-label="Mover para Esquerda">
+          <span class="touch-icon">◀</span>
+        </button>
+        <button class="touch-btn-game touch-btn-dir" id="btn-touch-right" aria-label="Mover para Direita">
+          <span class="touch-icon">▶</span>
+        </button>
+      </div>
+
+      <!-- Lado direito: Trocar Líder e Pular / Ação -->
+      <div class="touch-zone-right">
+        <button class="touch-btn-game touch-btn-switch" id="btn-touch-switch" aria-label="Alternar Personagem Líder">
+          <span class="touch-icon">⇄</span>
+          <span class="touch-sub">TROCAR</span>
+        </button>
+        <button class="touch-btn-game touch-btn-jump" id="btn-touch-jump" aria-label="Pular">
+          <span class="touch-icon">⬆</span>
+          <span class="touch-sub">PULAR</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden compatibility HUD elements -->
+    <div style="display:none;">
+      <span id="hud-phase-title">Fase 1: O Castelo Sem Cores</span>
+      <div id="btn-hud-mute">🔊</div>
+      <button id="btn-toggle-ps1">🎮 PS1: OFF</button>
+    </div>
+
+    <!-- Character Select Overlay -->
+    <div id="screen-char-select" class="overlay-screen">
+      <div class="fairytale-card">
+        <div class="card-title">O Castelo do Coração</div>
+        <div class="card-subtitle">Edição Portátil para Celular</div>
+        
+        <p style="font-size: 13px; color: #5a4935; margin-bottom: 8px;">
+          Escolha o líder da sua jornada:
+        </p>
+
+        <div class="char-options">
+          <div id="card-king" class="char-card selected">
+            <img src="assets/images/characters/king_idle.png" class="char-avatar" alt="O Rei">
+            <div class="char-name">O Rei</div>
+            <div class="char-role">Corajoso & Protetor</div>
+          </div>
+
+          <div id="card-queen" class="char-card">
+            <img src="assets/images/characters/queen_idle.png" class="char-avatar" alt="A Rainha">
+            <div class="char-name">A Rainha</div>
+            <div class="char-role">Doce & Esperançosa</div>
+          </div>
+        </div>
+
+        <div style="background: #faebd2; border-radius: 10px; padding: 8px 14px; margin-bottom: 14px; font-size: 11.5px; color: #724d1a; max-width: 520px;">
+          ✨ O casal sempre caminha junto! Use o botão <strong>[⇄ TROCAR]</strong> no canto direito para alternar quem você controla.
+        </div>
+
+        <button id="btn-confirm-char" class="btn-gold" style="padding: 12px 32px; font-size: 15px;">Iniciar Jornada Real 👑</button>
+      </div>
+    </div>
+
+    <!-- Cutscene Modal -->
+    <div id="screen-cutscene" class="overlay-screen hidden">
+      <div class="fairytale-card cutscene-card-mobile" style="max-width: 780px;">
+        <div class="cutscene-container">
+          <img id="cutscene-art-img" class="cutscene-art" src="assets/images/cutscenes/cutscene_1.png" alt="Ilustração do Livro">
+          
+          <div class="cutscene-content">
+            <span id="cutscene-tag" class="cutscene-phase-tag">Capítulo 1 de 8</span>
+            <h2 id="cutscene-heading" class="card-title" style="font-size: 19px; text-align: left;">O Castelo Sem Cores</h2>
+            
+            <p id="cutscene-desc" class="cutscene-text" style="font-size: 13px; max-height: 140px; overflow-y: auto;">
+              Era uma vez, em um reino distante, um rei e uma rainha que moravam em um lindo castelo...
+            </p>
+
+            <div class="voice-status" style="margin: 8px 0;">
+              <div class="voice-wave">
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+              </div>
+              <span style="font-size: 11px;">Locução: <strong>Thalita Neural</strong></span>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 6px; width: 100%;">
+              <button id="btn-replay-voice" class="btn-gold" style="flex: 1; padding: 10px; font-size: 12px; background: #faebd2; color: #724d1a; border-color: #dfc382;">Ouvir 🎙️</button>
+              <button id="btn-start-level" class="btn-gold" style="flex: 1.4; padding: 10px; font-size: 13px;">Entrar na Fase ⚔️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Victory Screen -->
+    <div id="screen-victory" class="overlay-screen hidden">
+      <div class="fairytale-card" style="max-width: 680px;">
+        <div class="card-title" style="color: #2e7d32; font-size: 24px;">O Poder da Adoção!</div>
+        <div class="card-subtitle" style="font-size: 14px;">O Castelo Ganhou Todas as Cores do Amor</div>
+
+        <img src="assets/images/characters/children_trio.png" style="max-width: 280px; width: 85%; max-height: 170px; object-fit: contain; filter: drop-shadow(0 8px 20px rgba(0,0,0,0.25)); margin: 6px 0 10px 0;" alt="Filhos: Matheus, Pedro e Maria Rosa">
+
+        <div style="font-size: 13px; font-weight: bold; color: #b68d40; margin-bottom: 8px;">
+          💙 Matheus &nbsp;•&nbsp; ⚔️ Pedro &nbsp;•&nbsp; 🌸 Maria Rosa
+        </div>
+
+        <p style="font-size: 12.5px; line-height: 1.5; color: #3b3126; max-width: 540px; margin-bottom: 14px; font-style: italic; background: #fff; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #faebcd;">
+          "E assim descobriram que uma verdadeira família nasce do AMOR, nasce do cuidado e do afeto... que o ABRAÇO vai ser sempre uma porta aberta para a felicidade, que filhos não precisam nascer só da barriga e que também podem nascer no coração. Esse é o poder da adoção!"
+        </p>
+
+        <button id="btn-play-again" class="btn-gold" style="padding: 10px 24px; font-size: 14px;">Jogar Novamente 👑</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts do Jogo Compartilhados -->
+  <script src="js/engine/input.js?v=4"></script>
+  <script src="js/engine/audio.js?v=3"></script>
+  <script src="js/engine/physics.js?v=3"></script>
+  <script src="js/engine/camera.js?v=3"></script>
+  <script src="js/entities/player.js?v=3"></script>
+  <script src="js/entities/npc.js?v=3"></script>
+  <script src="js/entities/collectable.js?v=3"></script>
+  <script src="js/levels/levels.js?v=3"></script>
+  <script src="js/main.js?v=4"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      window.game = new Game();
+    });
+  </script>
+</body>
+</html>
