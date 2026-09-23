@@ -401,9 +401,14 @@
     <h1 class="game-title">O Castelo que Nasce do Coração</h1>
     <h2 class="game-subtitle">Um Conto de Amor, Magia e Adoção</h2>
 
-    <p class="project-credit">
-      "Uma verdadeira família nasce do amor, do cuidado e do afeto... os filhos também nascem no coração. Esse é o poder da adoção!"
-    </p>
+    <div class="project-credit" style="position: relative;">
+      "E assim descobriram que uma verdadeira família nasce do AMOR, nasce do cuidado e do afeto... que o ABRAÇO vai ser sempre uma porta aberta para a felicidade, que filhos não precisam nascer só da barriga e que também podem nascer no coração. Esse é o poder da adoção!"
+      <div style="margin-top: 8px;">
+        <button id="btnPortalNarration" onclick="togglePortalNarration()" style="background: linear-gradient(180deg, #dfc382 0%, #b68d40 100%); color: #2b1f0c; border: 1.5px solid #fae8c0; border-radius: 20px; padding: 6px 16px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 3px 8px rgba(182,141,64,0.35); font-family: inherit; transition: all 0.2s;">
+          <span id="portalAudioIcon">🔊</span> <span id="portalAudioText">Ouvir Locução da Mensagem</span>
+        </button>
+      </div>
+    </div>
 
     <!-- Seletor de Plataforma (Celular / Computador) -->
     <div class="platform-selector">
@@ -593,10 +598,33 @@
       if (target) target.classList.add('active');
     }
 
+    let portalAudio = null;
+    function togglePortalNarration() {
+      playBeep(620, 'sine', 0.05);
+      if (!portalAudio) {
+        portalAudio = new Audio('assets/audio/victory_narration.mp3?v=7.1');
+        portalAudio.onended = () => {
+          document.getElementById('portalAudioIcon').textContent = '🔊';
+          document.getElementById('portalAudioText').textContent = 'Ouvir Locução da Mensagem';
+        };
+      }
+      if (portalAudio.paused) {
+        portalAudio.play().then(() => {
+          document.getElementById('portalAudioIcon').textContent = '⏸️';
+          document.getElementById('portalAudioText').textContent = 'Pausar Locução';
+        }).catch(e => console.log('Audio error:', e));
+      } else {
+        portalAudio.pause();
+        document.getElementById('portalAudioIcon').textContent = '🔊';
+        document.getElementById('portalAudioText').textContent = 'Ouvir Locução da Mensagem';
+      }
+    }
+
     function actionStartGame() {
       playBeep(880, 'triangle', 0.12);
+      if (portalAudio) { portalAudio.pause(); }
       setTimeout(() => {
-        window.location.href = currentPlatform + '/index.html?fase=1&char=' + chosenLeader + '&v=7.0';
+        window.location.href = currentPlatform + '/index.html?fase=1&char=' + chosenLeader + '&v=7.1';
       }, 100);
     }
 
@@ -607,8 +635,9 @@
 
     function launchPhase(phaseNumber) {
       playBeep(920, 'sine', 0.12);
+      if (portalAudio) { portalAudio.pause(); }
       setTimeout(() => {
-        window.location.href = currentPlatform + '/index.html?fase=' + phaseNumber + '&direct=1&char=' + chosenLeader + '&v=7.0';
+        window.location.href = currentPlatform + '/index.html?fase=' + phaseNumber + '&direct=1&char=' + chosenLeader + '&v=7.1';
       }, 100);
     }
 

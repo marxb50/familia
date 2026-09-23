@@ -190,6 +190,43 @@ class AudioManager {
     return this.currentNarration;
   }
 
+  playVictoryNarration(onEndCallback) {
+    this.stopNarration();
+
+    const now = Date.now();
+    if (this._lastNarrationPlay && (now - this._lastNarrationPlay < 350) && this._lastNarrationPhase === 'victory') {
+      return this.currentNarration;
+    }
+    this._lastNarrationPlay = now;
+    this._lastNarrationPhase = 'victory';
+
+    if (AudioManager._globalNarration) {
+      try {
+        AudioManager._globalNarration.pause();
+        AudioManager._globalNarration.currentTime = 0;
+        AudioManager._globalNarration.src = '';
+      } catch (_) {}
+      AudioManager._globalNarration = null;
+    }
+
+    const audioUrl = 'assets/audio/victory_narration.mp3?v=7.1';
+    const narrationAudio = new Audio(audioUrl);
+    narrationAudio.volume = this.muted ? 0 : 1;
+    this.currentNarration = narrationAudio;
+    AudioManager._globalNarration = narrationAudio;
+
+    if (onEndCallback) {
+      narrationAudio.addEventListener('ended', onEndCallback, { once: true });
+    }
+
+    narrationAudio.play().catch(e => {
+      console.log('Victory narration autoplay prevented or file loading:', e);
+      if (onEndCallback) onEndCallback();
+    });
+
+    return this.currentNarration;
+  }
+
   stopNarration() {
     if (this.currentNarration) {
       try {

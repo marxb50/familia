@@ -232,18 +232,45 @@ class Game {
       }
     });
 
+    // Victory Screen buttons
+    const btnReplayVictoryVoice = document.getElementById('btn-replay-victory-voice');
+    if (btnReplayVictoryVoice) {
+      let victoryAudioBusy = false;
+      const handleVictoryAudio = (e) => {
+        if (e && e.type === 'touchend') e.preventDefault();
+        if (victoryAudioBusy) return;
+        victoryAudioBusy = true;
+        setTimeout(() => { victoryAudioBusy = false; }, 400);
+
+        try { if (this.audio && this.audio.playClick) this.audio.playClick(); } catch (_) {}
+        if (this.audio && this.audio.currentNarration && !this.audio.currentNarration.paused) {
+          this.audio.stopNarration();
+          this.updateVictoryVoiceUI(false);
+        } else {
+          this.playVictoryAudio();
+        }
+      };
+      btnReplayVictoryVoice.addEventListener('click', handleVictoryAudio);
+      btnReplayVictoryVoice.addEventListener('touchend', handleVictoryAudio);
+    }
+
     // Victory play again button
     const btnPlayAgain = document.getElementById('btn-play-again');
     if (btnPlayAgain) {
-      btnPlayAgain.addEventListener('click', () => {
-        this.audio.playClick();
+      const handlePlayAgain = (e) => {
+        if (e && e.type === 'touchend') e.preventDefault();
+        try { if (this.audio && this.audio.stopNarration) this.audio.stopNarration(); } catch (_) {}
+        this.updateVictoryVoiceUI(false);
+        try { if (this.audio && this.audio.playClick) this.audio.playClick(); } catch (_) {}
         const victoryScreen = document.getElementById('screen-victory');
         if (victoryScreen) victoryScreen.classList.add('hidden');
         this.resetColorsHUD();
         this.currentLevelIndex = 0;
         this.initRoyalCouple();
         this.showCutscene(0);
-      });
+      };
+      btnPlayAgain.addEventListener('click', handlePlayAgain);
+      btnPlayAgain.addEventListener('touchend', handlePlayAgain);
     }
   }
 
@@ -481,6 +508,34 @@ class Game {
     const victoryScreen = document.getElementById('screen-victory');
     victoryScreen.classList.remove('hidden');
     this.particles.spawnConfetti(this.width, this.height);
+    try { if (this.audio && this.audio.playVictoryFanfare) this.audio.playVictoryFanfare(); } catch (_) {}
+    setTimeout(() => {
+      this.playVictoryAudio();
+    }, 1200);
+  }
+
+  updateVictoryVoiceUI(isPlaying) {
+    const wave = document.getElementById('victory-voice-wave');
+    const label = document.getElementById('victory-voice-label');
+    const icon = document.getElementById('victory-voice-icon');
+    if (wave) {
+      wave.style.opacity = isPlaying ? '1' : '0.35';
+    }
+    if (label) {
+      label.textContent = isPlaying ? 'Pausar Locução' : 'Ouvir Locução';
+    }
+    if (icon) {
+      icon.textContent = isPlaying ? '⏸️' : '🔊';
+    }
+  }
+
+  playVictoryAudio() {
+    this.updateVictoryVoiceUI(true);
+    if (this.audio && this.audio.playVictoryNarration) {
+      this.audio.playVictoryNarration(() => {
+        this.updateVictoryVoiceUI(false);
+      });
+    }
   }
 
   loop(timestamp) {
