@@ -374,3 +374,156 @@ body {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   MODO CELULAR EM PÉ (PORTRAIT CONSOLE LAYOUT - MODELO JOGO-CAJULIM)
+   ========================================================================== */
+.portrait-console-label {
+  display: none;
+}
+
+@media (orientation: portrait) {
+  html, body {
+    background: #110d0a;
+  }
+
+  .mobile-wrapper {
+    --portrait-header: 68px;
+    --portrait-screen-width: min(calc(100dvw - 20px), 480px);
+    --portrait-screen-height: calc(var(--portrait-screen-width) * 0.5625);
+    justify-content: flex-start;
+    padding-top: var(--portrait-header);
+    isolation: isolate;
+    background:
+      radial-gradient(circle at 12% 10%, rgba(223, 195, 130, 0.15) 0 3px, transparent 4px),
+      radial-gradient(circle at 88% 15%, rgba(182, 141, 64, 0.2) 0 2px, transparent 3px),
+      linear-gradient(168deg, #2b1f14 0%, #1c140d 38%, #120d09 70%, #090604 100%);
+    box-shadow:
+      inset 0 0 0 3px rgba(182, 141, 64, 0.35),
+      inset 0 -28px 55px rgba(0, 0, 0, 0.65);
+  }
+
+  /* Rótulo do console portátil superior */
+  .portrait-console-label {
+    position: absolute;
+    top: max(10px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
+    z-index: 55;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    color: #dfc382;
+    border: 2px solid rgba(182, 141, 64, 0.85);
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(43, 31, 20, 0.95), rgba(18, 13, 9, 0.95));
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    font-family: 'Cinzel', serif;
+    font-weight: 800;
+    pointer-events: none;
+  }
+
+  .portrait-console-label img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+
+  .portrait-console-label span {
+    font-size: clamp(8px, 2.2dvw, 10.5px);
+    letter-spacing: 0.5px;
+    color: #f7da02;
+    text-shadow: 0 1px 2px #000;
+  }
+
+  /* Barra de ações superior alinhada à direita no modo em pé */
+  .mobile-top-bar {
+    top: max(10px, env(safe-area-inset-top));
+    left: auto;
+    right: max(12px, env(safe-area-inset-right));
+    height: 40px;
+  }
+
+  .mobile-hud-pill {
+    display: none; /* Oculta a pílula de hud do topo para dar espaço aos botões de ação */
+  }
+
+  /* Tela do console (Canvas 16:9 centralizado na metade superior) */
+  .canvas-container {
+    flex: 0 0 auto;
+    z-index: 2;
+    width: var(--portrait-screen-width);
+    height: var(--portrait-screen-height);
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 5px solid #231911;
+    border-bottom-width: 10px;
+    border-radius: 14px;
+    background: #000000;
+    box-shadow:
+      0 7px 0 #100b07,
+      0 14px 26px rgba(0, 0, 0, 0.7),
+      0 0 0 2px rgba(182, 141, 64, 0.65),
+      inset 0 0 0 2px #000;
+  }
+
+  /* LED Real indicador de energia */
+  .canvas-container::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    z-index: 10;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 8px #22c55e, 0 0 14px rgba(34, 197, 94, 0.8);
+    pointer-events: none;
+  }
+
+  /* Controles táteis na metade inferior (abaixo da tela do jogo) */
+  .touch-controls-layer {
+    top: calc(var(--portrait-header) + var(--portrait-screen-height) + 16px);
+    bottom: 0;
+    align-items: center;
+    padding: 0 max(22px, env(safe-area-inset-right)) 0 max(22px, env(safe-area-inset-left));
+  }
+
+  .touch-zone-left {
+    gap: 16px;
+  }
+
+  .touch-btn-dir {
+    width: clamp(70px, 18vw, 86px);
+    height: clamp(70px, 18vw, 86px);
+    font-size: 32px;
+    border-width: 3px;
+    border-color: #f59e0b;
+    box-shadow: 0 6px 0 #451a03, 0 10px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .touch-zone-right {
+    gap: 14px;
+  }
+
+  .touch-btn-jump {
+    width: clamp(80px, 20vw, 96px);
+    height: clamp(80px, 20vw, 96px);
+    font-size: 28px;
+    border-width: 3.5px;
+    border-color: #f7da02;
+    box-shadow: 0 6px 0 #713f12, 0 10px 22px rgba(0, 0, 0, 0.55);
+  }
+
+  .touch-btn-switch {
+    width: clamp(62px, 15vw, 74px);
+    height: clamp(62px, 15vw, 74px);
+    font-size: 22px;
+    border-width: 2.5px;
+    border-color: #818cf8;
+    box-shadow: 0 5px 0 #1e1b4b, 0 8px 18px rgba(0, 0, 0, 0.45);
+  }
+}
+
