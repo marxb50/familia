@@ -66,12 +66,12 @@ class Character {
     spriteNames.forEach(name => {
       // Color sprites
       const imgColor = new Image();
-      imgColor.src = `assets/images/characters/${prefix}_${name}.png?v=6.0`;
+      imgColor.src = `assets/images/characters/${prefix}_${name}.png?v=7.0`;
       this.spritesColor[name] = imgColor;
 
       // Dedicated B&W sprites
       const imgBW = new Image();
-      imgBW.src = `assets/images/characters/${prefix}_${name}_bw.png?v=6.0`;
+      imgBW.src = `assets/images/characters/${prefix}_${name}_bw.png?v=7.0`;
       this.spritesBW[name] = imgBW;
     });
 
