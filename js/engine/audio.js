@@ -19,10 +19,38 @@ class AudioManager {
     }
   }
 
+  init() {
+    this.initAudioContext();
+    this.resume();
+  }
+
   resume() {
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
+  }
+
+  playClick() {
+    if (this.muted || !this.ctx) return;
+    try {
+      this.resume();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch(e) {}
   }
 
   playJump() {

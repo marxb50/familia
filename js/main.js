@@ -116,13 +116,16 @@ class Game {
     }
 
     if (btnConfirm) {
-      btnConfirm.addEventListener('click', () => {
-        this.audio.init();
-        this.audio.playClick();
-        document.getElementById('screen-char-select').classList.add('hidden');
+      const handleConfirm = () => {
+        try { if (this.audio && this.audio.init) this.audio.init(); } catch (_) {}
+        try { if (this.audio && this.audio.playClick) this.audio.playClick(); } catch (_) {}
+        const charSelect = document.getElementById('screen-char-select');
+        if (charSelect) charSelect.classList.add('hidden');
         this.initRoyalCouple();
         this.showCutscene(0);
-      });
+      };
+      btnConfirm.addEventListener('click', handleConfirm);
+      btnConfirm.addEventListener('touchend', (e) => { e.preventDefault(); handleConfirm(); });
     }
 
     // Cutscene buttons
@@ -130,19 +133,24 @@ class Game {
     const btnReplayVoice = document.getElementById('btn-replay-voice');
 
     if (btnStartLevel) {
-      btnStartLevel.addEventListener('click', () => {
-        this.audio.playClick();
-        this.audio.stopNarration();
-        document.getElementById('screen-cutscene').classList.add('hidden');
+      const handleStartLevel = () => {
+        try { if (this.audio && this.audio.playClick) this.audio.playClick(); } catch (_) {}
+        try { if (this.audio && this.audio.stopNarration) this.audio.stopNarration(); } catch (_) {}
+        const cutscene = document.getElementById('screen-cutscene');
+        if (cutscene) cutscene.classList.add('hidden');
         this.startCurrentLevel();
-      });
+      };
+      btnStartLevel.addEventListener('click', handleStartLevel);
+      btnStartLevel.addEventListener('touchend', (e) => { e.preventDefault(); handleStartLevel(); });
     }
 
     if (btnReplayVoice) {
-      btnReplayVoice.addEventListener('click', () => {
-        this.audio.playClick();
-        this.audio.playNarration(this.currentLevelIndex + 1);
-      });
+      const handleReplay = () => {
+        try { if (this.audio && this.audio.playClick) this.audio.playClick(); } catch (_) {}
+        try { if (this.audio && this.audio.playNarration) this.audio.playNarration(this.currentLevelIndex + 1); } catch (_) {}
+      };
+      btnReplayVoice.addEventListener('click', handleReplay);
+      btnReplayVoice.addEventListener('touchend', (e) => { e.preventDefault(); handleReplay(); });
     }
 
     // HUD Leader switch
