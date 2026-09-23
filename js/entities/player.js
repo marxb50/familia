@@ -11,20 +11,25 @@ class Character {
     
     // Character-specific physics and dimensions
     if (this.type === 'pedro_horse') {
-      this.width = 150;
-      this.height = 140;
+      this.width = 155;
+      this.height = 145;
       this.speed = 7.4; // Galloping speed
       this.jumpForce = -17.2; // High horse jump
-    } else if (this.type === 'matheus_brush') {
-      this.width = 85;
-      this.height = 125;
+    } else if (this.type === 'matheus_brush' || this.type === 'matheus') {
+      this.width = 80;
+      this.height = 135;
       this.speed = 5.2;
       this.jumpForce = -15.2;
     } else if (this.type === 'maria_rosa') {
-      this.width = 90;
-      this.height = 130;
+      this.width = 80;
+      this.height = 135;
       this.speed = 4.9;
       this.jumpForce = -15.4; // Floaty jump
+    } else if (this.type === 'pedro') {
+      this.width = 80;
+      this.height = 135;
+      this.speed = 5.2;
+      this.jumpForce = -15.4;
     } else {
       // King & Queen
       this.width = 97;
@@ -55,18 +60,18 @@ class Character {
     if (prefix === 'pedro_horse') {
       spriteNames = ['idle', 'gallop1', 'gallop2', 'gallop3', 'gallop4', 'jump'];
     } else if (prefix === 'maria_rosa') {
-      spriteNames = ['ball_idle', 'dance1', 'dance2', 'dance3', 'dance4', 'jump'];
+      spriteNames = ['ball_idle', 'dance1', 'dance2', 'dance3', 'dance4', 'walk1', 'walk2', 'walk3', 'walk4', 'jump', 'idle'];
     }
 
     spriteNames.forEach(name => {
       // Color sprites
       const imgColor = new Image();
-      imgColor.src = `assets/images/characters/${prefix}_${name}.png?v=5`;
+      imgColor.src = `assets/images/characters/${prefix}_${name}.png?v=6.0`;
       this.spritesColor[name] = imgColor;
 
       // Dedicated B&W sprites
       const imgBW = new Image();
-      imgBW.src = `assets/images/characters/${prefix}_${name}_bw.png?v=5`;
+      imgBW.src = `assets/images/characters/${prefix}_${name}_bw.png?v=6.0`;
       this.spritesBW[name] = imgBW;
     });
 
@@ -182,11 +187,11 @@ class Character {
       }
     } else if (this.type === 'maria_rosa') {
       if (this.state === 'jump') {
-        currentSprite = spriteDict.jump || spriteDict.ball_idle;
+        currentSprite = spriteDict.jump || spriteDict.ball_idle || spriteDict.idle;
       } else if (this.state === 'walk') {
-        currentSprite = spriteDict[`dance${this.walkFrame}`] || spriteDict.ball_idle;
+        currentSprite = spriteDict[`dance${this.walkFrame}`] || spriteDict[`walk${this.walkFrame}`] || spriteDict.ball_idle;
       } else {
-        currentSprite = spriteDict.ball_idle;
+        currentSprite = spriteDict.ball_idle || spriteDict.idle;
       }
     } else {
       if (this.state === 'jump') {
